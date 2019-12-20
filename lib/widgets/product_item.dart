@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_shop_app/providers/auth.dart';
 import 'package:flutter_shop_app/providers/cart.dart';
 import 'package:flutter_shop_app/providers/product.dart';
 import 'package:flutter_shop_app/screens/product_detail_screen.dart';
@@ -14,6 +15,10 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authData = Provider.of<Auth>(context);
+
+    final scaffold = Scaffold.of(context);
+
     final product = Provider.of<Product>(context);
     final cart = Provider.of<Cart>(context);
     return ClipRRect(
@@ -34,7 +39,15 @@ class ProductItem extends StatelessWidget {
           leading: IconButton(
             icon: Icon(
                 product.isFavorite ? Icons.favorite : Icons.favorite_border),
-            onPressed: () => {product.toggleFavoriteStatus()},
+            onPressed: () =>
+            {
+              product
+                  .toggleFavoriteStatus(authData.userId, authData.token)
+                  .catchError((error) {
+                scaffold.showSnackBar(
+                    SnackBar(content: Text('Some thing wrong!!')));
+              })
+            },
             color: Theme.of(context).accentColor,
           ),
           trailing: IconButton(

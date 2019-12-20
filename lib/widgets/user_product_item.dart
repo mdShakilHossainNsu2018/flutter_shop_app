@@ -12,6 +12,7 @@ class UserProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scfold = Scaffold.of(context);
     return ListTile(
       title: Text(title),
       leading: CircleAvatar(
@@ -27,9 +28,8 @@ class UserProductItem extends StatelessWidget {
                 color: Theme.of(context).primaryColor,
               ),
               onPressed: () {
-                Navigator.of(context).pushNamed(
-                    EditProductScreen.editProductScreenName,
-                    arguments: id);
+                Navigator.of(context)
+                    .pushNamed(EditProductScreen.routeName, arguments: id);
               },
             ),
             IconButton(
@@ -37,8 +37,19 @@ class UserProductItem extends StatelessWidget {
                   Icons.delete,
                   color: Theme.of(context).errorColor,
                 ),
-                onPressed: () {
-                  Provider.of<Products>(context).deleteProduct(id);
+                onPressed: () async {
+                  try {
+                    await Provider.of<Products>(context)
+                        .deleteProduct(id)
+                        .catchError((error) {
+//                      print(error.toString());
+                      scfold.showSnackBar(
+                          SnackBar(content: Text('somthing worng!!')));
+                    });
+                  } catch (error) {
+                    scfold.showSnackBar(
+                        SnackBar(content: Text('somthing worng!!')));
+                  }
                 }),
           ],
         ),
